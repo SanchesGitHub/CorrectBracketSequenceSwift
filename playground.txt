@@ -1,0 +1,177 @@
+import Foundation
+
+struct Stack {
+  fileprivate var array: [Character] = []
+
+    mutating func push(_ element: Character) {
+        array.append(element)
+    }
+
+    mutating func pop() -> Character? {
+        return array.popLast()
+    }
+
+    func peek() -> Character? {
+        return array.last
+    }
+
+    var isEmpty: Bool {
+        return array.isEmpty
+    }
+
+    var count: Int {
+        return array.count
+    }
+
+}
+
+public class Node {
+    var value: Int
+    var next: Node?
+    weak var previous: Node?
+ 
+    init(value: Int) {
+        self.value = value
+    }
+
+}
+
+public class LinkedList {
+    fileprivate var head: Node?
+    private var tail: Node?
+
+    public var isEmpty: Bool {
+        return head == nil
+    }
+
+    public var first: Node? {
+        return head
+    }
+
+    public var last: Node? {
+        return tail
+    }
+
+    public func append(value: Int) {
+        let newNode = Node(value: value)
+
+        if let tailNode = tail {
+            newNode.previous = tailNode
+            tailNode.next = newNode
+        } 
+        else {
+            head = newNode
+        }
+        tail = newNode
+    }
+
+    public func nodeAt(index: Int) -> Node? {
+        if index >= 0 {
+            var node = head
+            var i = index
+            while node != nil {
+            if i == 0 { return node }
+            i -= 1
+            node = node!.next
+            }
+        }
+        return nil
+    }
+
+    public func remove(node: Node) -> Int {
+        let prev = node.previous
+        let next = node.next
+
+        if let prev = prev {
+            prev.next = next
+        } else { 
+            head = next
+        }
+        next?.previous = prev
+
+        if next == nil { 
+            tail = prev
+        }
+
+        node.previous = nil 
+        node.next = nil
+
+        return node.value
+    }
+}
+
+func checkBrackets(string: String) -> Int {
+    let line—haracters = Array(string)
+
+    var stack = Stack()
+    let openedBrackets = LinkedList()
+    let closedBrackets = LinkedList()
+
+    var counter = 0
+    var index = 0
+
+    for char in line—haracters {
+         counter+=1
+
+        if (char == "(" || char == "{" || char == "[") {
+            stack.push(char)
+            openedBrackets.append(value: counter)
+         }
+
+        if (char == ")" || char == "}" || char == "]") {
+            if stack.isEmpty == false {
+                let fromStack = stack.peek()
+                if (char == ")" && fromStack == "(" ||
+                    char == "}" && fromStack == "{" ||
+                    char == "]" && fromStack == "["
+                ) {
+                    stack.pop()
+                    openedBrackets.remove(node: openedBrackets.last!)
+                } else {
+                    closedBrackets.append(value: counter)
+                    break
+                }
+            } else {
+                stack.push(char)
+                closedBrackets.append(value: counter)
+                break
+            }
+        }
+    }
+
+
+    if stack.isEmpty == false {
+        if closedBrackets.isEmpty == false {
+            index = closedBrackets.first!.value
+        } else {
+            if openedBrackets.isEmpty == false {
+                index = openedBrackets.first!.value
+            }
+        }
+    } else {
+        index = -1
+    }
+
+    return index
+}
+
+let result1 = checkBrackets(string: "[ ]")
+print(result1)
+
+let result2 = checkBrackets(string: "{}[]")
+print(result2)
+
+let result3 = checkBrackets(string: "{[]}()")
+print(result3)
+
+let result4 = checkBrackets(string: "{")
+print(result4)
+
+let result5 = checkBrackets(string: "{[}")
+print(result5)
+
+let result6 = checkBrackets(string: "foo(bar)")
+print(result6)
+
+let result7 = checkBrackets(string: "foo(bar[i)")
+print(result7)
